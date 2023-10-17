@@ -1,6 +1,6 @@
 # ML-EnsembleHub 🚀
 
-ML-EnsembleHub is an innovative and user-friendly platform designed to streamline the process of constructing and assessing machine learning models. Through a component-based and drag-and-drop approach, it enables users to effortlessly harness various classifiers, feature selection techniques, and model selection methods. 
+ML-EnsembleHub is an innovative and user-friendly platform designed to streamline the process of constructing and assessing machine learning models. Through a drag-and-drop approach, it enables users to effortlessly harness various classifiers, feature selection techniques, and model selection methods. 
 
 ## Prerequisites
 - Python 3.x
@@ -29,12 +29,12 @@ python main.py  --data <path_to_data>
 - `--data` - Specify the path to your data
 - `--cfg` - Indicate the path to your configuration
 - `--save-dir` - Set the directory for saving results
-- `--name` - Define a name for your experiment
+- `--name` - Define a name for the experiment
 - `--save` - Enable result saving
 - `--plot` - Generate result plots
 
 ## Configuration
-Utilize the comprehensive YAML configuration to fine-tune your experiments:
+Utilize the YAML configuration to fine-tune experiments:
 
 ```yaml
 shuffle: <bool>
@@ -69,7 +69,7 @@ model_selection:
 - `model_selection` - Pick a model selection method
 
 ## Dataset 
-Ensure your data is in CSV format, with the first column designated as `label` and subsequent columns representing features:
+Ensure data is in CSV format, with the first column designated as `label` and subsequent columns representing features:
 
 | label | feature1 | feature2 | ... |
 |-------|----------|----------|-----|
