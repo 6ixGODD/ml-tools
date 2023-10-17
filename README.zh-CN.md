@@ -1,12 +1,22 @@
-# ML-EnsembleHub
-## 安装
+# ML-EnsembleHub 🚀
+
+ML-EnsembleHub 是一款创新且用户友好的平台，旨在简化构建和评估机器学习模型的过程。通过基于组件和拖放的方法，它使用户能够轻松地利用各种分类器、特征选择技术和模型选择方法。
+
+## 先决条件 
 - Python 3.x
+
+## 安装 🛠
+通过克隆存储库并安装所需依赖项来开始使用 ML-EnsembleHub：
+
 ```bash
 git clone https://github.com/6ixGODD/ML-EnsembleHub.git
 cd ML-EnsembleHub
 pip install -r requirements.txt
 ```
-## 使用
+
+## 使用 
+使用以下命令行选项执行主要脚本：
+
 ```bash
 python main.py  --data <path_to_data> 
                 --cfg <path_to_config> 
@@ -15,14 +25,17 @@ python main.py  --data <path_to_data>
                 --save 
                 --plot
 ```
-- `--data` - 数据路径
-- `--cfg` - 配置路径
-- `--save-dir` - 保存路径
-- `--name` - 实验名称
-- `--save` - 保存结果
-- `--plot` - 可视化结果
 
-## 配置
+- `--data` - 指定数据的路径
+- `--cfg` - 指定配置的路径
+- `--save-dir` - 设置保存结果的目录
+- `--name` - 为您的实验定义一个名称
+- `--save` - 启用结果保存
+- `--plot` - 生成结果图表
+
+## 配置 
+利用详尽的 YAML 配置来微调您的实验：
+
 ```yaml
 shuffle: <bool>
 random_state: <int>
@@ -47,24 +60,25 @@ model_selection:
     <method_name>:
         <param_name>: <param_value>
 ```
-- `shuffle` - 是否打乱数据
-- `random_state` - 随机种子
-- `preprocessing` - 预处理方法
-- `classifiers` - 分类方法
-- `feature_selection` - 特征选择方法
-- `model_selection` - 采样方法
 
-## Dataset
-- 数据应该是csv格式，其中第一列是`label`，其他列是特征
+- `shuffle` - 启用数据混洗
+- `random_state` - 定义随机种子
+- `preprocessing` - 选择预处理方法
+- `classifiers` - 配置分类器列表
+- `feature_selection` - 选择特征选择方法
+- `model_selection` - 选择模型选择方法
 
-    | label | feature1 | feature2 | ... |
-    |-------|----------|----------|-----|
-    | 0/1   | value1   | value2   | ... |
-    | ...   | ...      | ...      | ... |
+## 数据集 
+确保您的数据以 CSV 格式存储，第一列指定为 `label`，后续列代表特征：
 
+| label | feature1 | feature2 | ... |
+|-------|----------|----------|-----|
+| 0/1   | value1   | value2   | ... |
+| ...   | ...      | ...      | ... |
 
+## 示例 
+使用以下命令运行示例实验：
 
-## 示例
 ```bash
 python main.py  --data data/iris.csv 
                 --cfg config/iris.yaml 
@@ -74,9 +88,10 @@ python main.py  --data data/iris.csv
                 --plot
 ```
 
-## 结果
-- 评估指标结果: `output/<name_of_experiment>/metrics/metrics.csv`
-- 评估指标可视化: `output/<name_of_experiment>/plots/`    
-- 模型文件: `output/<name_of_experiment>/models/`
-- 日志: `output/<name_of_experiment>/log.txt`
+## 结果 
+- 指标：`output/<name_of_experiment>/metrics/metrics.csv`
+- 图表：`output/<name_of_experiment>/plots/`    
+- 模型：`output/<name_of_experiment>/models/`
+- 日志：`output/<name_of_experiment>/log.txt`
 
+:)
