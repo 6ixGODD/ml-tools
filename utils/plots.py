@@ -16,7 +16,6 @@ def plot_roc(metrics, save_dir=Path("")):
         plt.plot(
             tpr,
             fpr,
-            color="darkorange",
             lw=2,
             label="{} (area = {:.2f})".format(metric.name, metric.metrics["roc_auc"]),
         )
@@ -40,7 +39,6 @@ def plot_pr(metrics, save_dir=Path("")):
         plt.plot(
             recall,
             precision,
-            color="darkorange",
             lw=2,
             label="{} (area = {:.2f})".format(metric.name, metric.metrics["pr_auc"]),
         )

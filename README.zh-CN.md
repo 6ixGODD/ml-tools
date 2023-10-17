@@ -2,6 +2,7 @@
 ## 安装
 - Python 3.x
 ```bash
+git clone https://github.com/6ixGODD/ML-EnsembleHub.git
 cd ML-EnsembleHub
 pip install -r requirements.txt
 ```
