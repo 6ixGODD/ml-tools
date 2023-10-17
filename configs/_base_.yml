@@ -1,0 +1,206 @@
+shuffle: True
+random_state: 42
+
+preprocessing:
+  method: StandardScaler
+  StandardScaler:
+    with_mean: True
+    with_std: True
+  MinMaxScaler:
+    feature_range: [ 0, 1 ]
+  MaxAbsScaler:
+    copy: True
+  RobustScaler:
+    with_centering: True
+    with_scaling: True
+    quantile_range: [ 25.0, 75.0 ]
+  Normalizer:
+    norm: l2
+    copy: True
+
+
+classifiers:
+  methods: [ SVC, RandomForest, LogisticRegression, KNN, AdaBoost, GaussianNB, Bagging, ExtraTrees, DecisionTree ]
+  SVC:
+    C: 1.0
+    kernel: rbf
+    degree: 3
+    gamma: scale
+    coef0: 0.0
+    shrinking: True
+    probability: True
+    tol: 0.001
+    cache_size: 200
+    class_weight: null
+    verbose: False
+    max_iter: -1
+    decision_function_shape: ovr
+    break_ties: False
+    random_state: 42
+  RandomForest:
+    n_estimators: 100
+    criterion: gini
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_features: "auto"
+    max_leaf_nodes: null
+    min_impurity_decrease: 0.0
+    bootstrap: True
+    oob_score: False
+    n_jobs: null
+    random_state: 42
+    verbose: 0
+    warm_start: False
+    class_weight: null
+    ccp_alpha: 0.0
+    max_samples: null
+  LogisticRegression:
+    penalty: l2
+    dual: False
+    tol: 0.0001
+    C: 1.0
+    fit_intercept: True
+    intercept_scaling: 1
+    class_weight: null
+    random_state: 42
+    solver: lbfgs
+    max_iter: 100
+    multi_class: auto
+    verbose: 0
+    warm_start: False
+    n_jobs: null
+    l1_ratio: null
+  KNN:
+    n_neighbors: 5
+    weights: uniform
+    algorithm: auto
+    leaf_size: 30
+    p: 2
+    metric: minkowski
+    metric_params: null
+    n_jobs: null
+  AdaBoost:
+    base_estimator: null
+    n_estimators: 50
+    learning_rate: 1.0
+    algorithm: SAMME.R
+    random_state: 42
+  GaussianNB:
+    priors: null
+    var_smoothing: 0.000000001
+  Bagging:
+    base_estimator: null
+    n_estimators: 10
+    max_samples: 1.0
+    max_features: 1.0
+    bootstrap: True
+    bootstrap_features: False
+    oob_score: False
+    warm_start: False
+    n_jobs: null
+    random_state: 42
+    verbose: 0
+  ExtraTrees:
+    n_estimators: 100
+    criterion: "gini"
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_features: "auto"
+    max_leaf_nodes: null
+    min_impurity_decrease: 0.0
+    bootstrap: False
+    oob_score: False
+    n_jobs: null
+    random_state: 42
+    verbose: 0
+    warm_start: False
+    class_weight: null
+    ccp_alpha: 0.0
+    max_samples: null
+  DecisionTree:
+    criterion: gini
+    splitter: best
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_features: null
+    random_state: 42
+    max_leaf_nodes: null
+    min_impurity_decrease: 0.0
+    class_weight: null
+    ccp_alpha: 0.0
+
+
+feature_selection:
+  method: LassoCV
+  SelectKBest:
+    score_func: f_classif
+    k: 10
+  SelectPercentile:
+    score_func: f_classif
+    percentile: 10
+  SelectFpr:
+    alpha: 0.05
+    score_func: f_classif
+  SelectFdr:
+    alpha: 0.05
+    score_func: f_classif
+  SelectFwe:
+    alpha: 0.05
+    score_func: f_classif
+  Lasso:
+    alpha: 1.0
+    fit_intercept: True
+    precompute: False
+    copy_X: True
+    max_iter: 1000
+    tol: 0.0001
+    warm_start: False
+    positive: False
+    random_state: 42
+    selection: cyclic
+  LassoCV:
+    eps: 0.001
+    n_alphas: 100
+    alphas: null
+    fit_intercept: True
+    precompute: auto
+    max_iter: 1000
+    tol: 0.0001
+    copy_X: True
+    cv: null
+    verbose: False
+    n_jobs: null
+    positive: False
+    random_state: 42
+    selection: cyclic
+
+
+model_selection:
+  method: train_test_split
+  KFold:
+    n_splits: 5
+    shuffle: True
+    random_state: 42
+  StratifiedKFold:
+    n_splits: 5
+    shuffle: True
+    random_state: 42
+  RepeatedKFold:
+    n_splits: 5
+    n_repeats: 10
+    random_state: 42
+  RepeatedStratifiedKFold:
+    n_splits: 5
+    n_repeats: 100
+    random_state: 42
+  train_test_split:
+    test_size: 0.2
+    shuffle: True
+    random_state: 42
+
