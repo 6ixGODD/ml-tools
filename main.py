@@ -64,8 +64,8 @@ def run(data, cfg, save_dir, plot, save):
         LOGGER.info("-" * 160)
         LOGGER.info("Feature selection: {}".format(cfg.feature_selection["method"]))
         if (
-            cfg.feature_selection["method"] == "Lasso"
-            or cfg.feature_selection["method"] == "LassoCV"
+                cfg.feature_selection["method"] == "Lasso"
+                or cfg.feature_selection["method"] == "LassoCV"
         ):
             fs = get_feature_selection(cfg.feature_selection["method"])
             fs = fs(**cfg.feature_selection[cfg.feature_selection["method"]])
@@ -95,7 +95,7 @@ def run(data, cfg, save_dir, plot, save):
     for clf_name in cfg.classifiers["methods"]:
         clf = get_classifiers(clf_name)
         clf = clf(**cfg.classifiers[clf_name])
-        clf.fit(X, y)
+
         LOGGER.info("-" * 160)
         LOGGER.info("> Classifier: {}".format(clf_name))
         LOGGER.info("-" * 160)
@@ -149,28 +149,29 @@ def run(data, cfg, save_dir, plot, save):
             "RepeatedKFold",
             "RepeatedStratifiedKFold",
         ]:
-            tpr_list, fpr_list, precision_list, recall_list, roc_auc_list, pr_auc_list, cm_list = ([] for _ in range(7))
+            tpr_list, precision_list, roc_auc_list, pr_auc_list, cm_list = ([] for _ in range(5))
             ms = ms(**cfg.model_selection[cfg.model_selection["method"]])
+            fpr_, recall_ = np.linspace(0, 1, 100), np.linspace(0, 1, 100)
             for i, (train_index, test_index) in tqdm(
-                enumerate(ms.split(X, y)),
-                desc=clf_name,
-                total=ms.get_n_splits(),
-                ncols=60,
-                unit="fold",
-                mininterval=0,
-                position=0,
+                    enumerate(ms.split(X, y)),
+                    desc=clf_name,
+                    total=ms.get_n_splits(),
+                    ncols=60,
+                    unit="fold",
+                    mininterval=0,
+                    position=0,
             ):
-                X_train, X_test = X[train_index], X[test_index]
-                y_train, y_test = y[train_index], y[test_index]
-                clf.fit(X_train, y_train)
+                X_train, X_test = pd.DataFrame(X).iloc[train_index], pd.DataFrame(X).iloc[test_index]
+                y_train, y_test = pd.DataFrame(y).iloc[train_index], pd.DataFrame(y).iloc[test_index]
+                clf.fit(X_train, y_train.values.ravel())
                 y_pred = clf.predict(X_test)
                 y_pred_proba = clf.predict_proba(X_test)[:, 1]
                 tpr, fpr, thresholds = roc_curve(y_test, y_pred_proba)
                 precision, recall, thresholds = precision_recall_curve(y_test, y_pred_proba)
-                tpr_list.append(tpr)
-                fpr_list.append(fpr)
-                precision_list.append(precision)
-                recall_list.append(recall)
+                tpr_list.append(np.interp(fpr_, fpr, tpr))
+                tpr_list[-1][0] = 0.0
+                precision_list.append(np.interp(recall_, recall[::-1], precision[::-1]))
+                precision_list[-1][0] = 1.0
                 roc_auc_list.append(roc_auc_score(y_test, y_pred))
                 pr_auc_list.append(roc_auc_score(y_test, y_pred))
                 cm_list.append(confusion_matrix(y_test, y_pred))
@@ -185,11 +186,11 @@ def run(data, cfg, save_dir, plot, save):
                     )
                 )
             tpr = np.mean(tpr_list, axis=0)
-            fpr = np.mean(fpr_list, axis=0)
+            fpr = fpr_
             precision = np.mean(precision_list, axis=0)
-            recall = np.mean(recall_list, axis=0)
-            roc_auc = np.mean(roc_auc_list, axis=0)
-            pr_auc = np.mean(pr_auc_list, axis=0)
+            recall = recall_
+            roc_auc = np.mean(roc_auc_list)
+            pr_auc = np.mean(pr_auc_list)
             cm = np.mean(cm_list, axis=0)
 
             metrics.append(
@@ -264,6 +265,7 @@ def run(data, cfg, save_dir, plot, save):
             )
         )
     )
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
