@@ -59,7 +59,7 @@ def run(data, cfg, save_dir, plot, save):
         + "-" * 160
         + "\n- start running..."
     )
-    X, y = data.iloc[:, :-1], data.iloc[:, -1]
+    y, X = data["label"], data.drop("label", axis=1)
 
     # data preprocessing
     if cfg.shuffle:
@@ -90,28 +90,49 @@ def run(data, cfg, save_dir, plot, save):
             LOGGER.info("\tSelected {:d} variables".format(len(X[0])))
             LOGGER.info("\talpha: {}".format(fs.alpha_))
         # other methods
-        else:
-            fs = get_feature_selection(cfg.feature_selection["method"])
-            score_func = get_feature_selection(
-                cfg.feature_selection[cfg.feature_selection["method"]].pop("score_func")
-            )
-            fs = fs(
-                **cfg.feature_selection[cfg.feature_selection["method"]],
-                score_func=score_func,
-            )
-            fs.fit(X, y)
-            X = fs.transform(X)
-            LOGGER.info(
-                "- Selected features: {}"
-                "\n\t Feature scores: {}"
-                "\n\t Feature pvalues: {}".format(
-                    str(fs.get_support(indices=True)).replace("\n", "\n\t"),
-                    str(fs.scores_).replace("\n", "\n\t"),
-                    str(fs.pvalues_).replace("\n", "\n\t"),
+        elif cfg.feature_selection["method"] in [
+            "SelectKBest",
+            "SelectPercentile",
+            "SelectFpr",
+            "SelectFdr",
+            "SelectFwe",
+        ]:
+            # k should be <= n_features. avoid `ValueError` in `fit`
+            if cfg.feature_selection["method"] is "SelectKBest":
+                if (
+                    cfg.feature_selection[cfg.feature_selection["method"]]["k"]
+                    > X.shape[1]
+                ):
+                    warnings.warn(
+                        "k should be less than or equal to the number of features. skipping..."
+                    )
+            else:
+                fs = get_feature_selection(cfg.feature_selection["method"])
+                score_func = get_feature_selection(
+                    cfg.feature_selection[cfg.feature_selection["method"]].pop(
+                        "score_func"
+                    )
                 )
-                + "\n"
-                + "-" * 160
-            )
+                fs = fs(
+                    **cfg.feature_selection[cfg.feature_selection["method"]],
+                    score_func=score_func,
+                )
+                fs.fit(X, y)
+                X = fs.transform(X)
+                LOGGER.info(
+                    "- Selected features: {}"
+                    "\n\t Feature scores: {}"
+                    "\n\t Feature pvalues: {}".format(
+                        str(fs.get_support(indices=True)).replace("\n", "\n\t"),
+                        str(fs.scores_).replace("\n", "\n\t"),
+                        str(fs.pvalues_).replace("\n", "\n\t"),
+                    )
+                    + "\n"
+                    + "-" * 160
+                )
+
+        else:
+            raise NotImplementedError
 
     # train
     LOGGER.info("- start training...")

@@ -137,7 +137,7 @@ classifiers:
 
 
 feature_selection:
-  method: LassoCV
+  method: null
   SelectKBest:
     score_func: f_classif
     k: 10

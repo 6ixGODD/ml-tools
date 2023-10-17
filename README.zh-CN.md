@@ -51,7 +51,7 @@ classifiers:
         <param_name>: <param_value>
 
 feature_selection:
-    method: <method_name>
+    method: <method_name>/null
     <method_name>:
         <param_name>: <param_value>
 
