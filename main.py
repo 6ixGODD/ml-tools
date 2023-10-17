@@ -78,6 +78,7 @@ def run(data, cfg, save_dir, plot, save):
             "-" * 160
             + "\n> Feature selection: {}".format(cfg.feature_selection["method"])
         )
+        # Lasso and LassoCV
         if (
             cfg.feature_selection["method"] == "Lasso"
             or cfg.feature_selection["method"] == "LassoCV"
@@ -88,7 +89,7 @@ def run(data, cfg, save_dir, plot, save):
             X = X[:, fs.coef_ != 0]
             LOGGER.info("\tSelected {:d} variables".format(len(X[0])))
             LOGGER.info("\talpha: {}".format(fs.alpha_))
-
+        # other methods
         else:
             fs = get_feature_selection(cfg.feature_selection["method"])
             score_func = get_feature_selection(
@@ -118,7 +119,6 @@ def run(data, cfg, save_dir, plot, save):
     for clf_name in cfg.classifiers["methods"]:
         clf = get_classifiers(clf_name)
         clf = clf(**cfg.classifiers[clf_name])
-
         LOGGER.info(
             "-" * 160
             + "\n> Classifier: {}".format(clf_name)
@@ -130,6 +130,7 @@ def run(data, cfg, save_dir, plot, save):
 
         # model selection
         ms = get_model_selection(cfg.model_selection["method"])
+        # train_test_split
         if cfg.model_selection["method"] == "train_test_split":
             X_train, X_test, y_train, y_test = ms(
                 X, y, **cfg.model_selection[cfg.model_selection["method"]]
@@ -170,6 +171,8 @@ def run(data, cfg, save_dir, plot, save):
                     },
                 )
             )
+
+        # KFold, StratifiedKFold, RepeatedKFold, RepeatedStratifiedKFold
         elif cfg.model_selection["method"] in [
             "KFold",
             "StratifiedKFold",
@@ -190,6 +193,7 @@ def run(data, cfg, save_dir, plot, save):
                 mininterval=0,
                 position=0,
             ):
+                # use iloc to avoid SettingWithCopyWarning
                 X_train, X_test = (
                     pd.DataFrame(X).iloc[train_index],
                     pd.DataFrame(X).iloc[test_index],
@@ -213,7 +217,12 @@ def run(data, cfg, save_dir, plot, save):
                 pr_auc_list.append(roc_auc_score(y_test, y_pred))
                 cm_list.append(confusion_matrix(y_test, y_pred))
                 LOGGER.info(
-                    "\tNo.{:d} fold:\tAccuracy: {:.5f}  Precision: {:.5f}  Recall: {:.5f}  F1: {:.5f}  AUC: {:.5f}".format(
+                    "\tNo.{:d} fold:"
+                    "\tAccuracy: {:.5f}  "
+                    "Precision: {:.5f} "
+                    " Recall: {:.5f} "
+                    " F1: {:.5f}  "
+                    "AUC: {:.5f}".format(
                         i,
                         accuracy_score(y_test, y_pred),
                         precision_score(y_test, y_pred),
@@ -254,15 +263,12 @@ def run(data, cfg, save_dir, plot, save):
                 os.makedirs(Path(save_dir, "models"))
             clf.fit(X, y)
             with open(Path(save_dir, "models", f"{clf_name}.pkl"), "wb") as f:
-                pickle.dump(clf, f)
+                pickle.dump(clf, f)  # add other serialization methods
             LOGGER.info(
                 "* Model saved to `{}`".format(
                     Path(save_dir, "models", f"{clf_name}.pkl")
                 )
             )
-    # save metrics as csv
-    if not Path(save_dir, "metrics").exists():
-        Path(save_dir, "metrics").mkdir(parents=True, exist_ok=True)
     metrics_df = pd.DataFrame()
     for m in metrics:
         metrics_df = metrics_df.append(
@@ -279,6 +285,10 @@ def run(data, cfg, save_dir, plot, save):
                 }
             )
         )
+
+    # save metrics as csv
+    if not Path(save_dir, "metrics").exists():
+        Path(save_dir, "metrics").mkdir(parents=True, exist_ok=True)
     metrics_df.to_csv(Path(save_dir, "metrics", "metrics.csv"), index=False)
     LOGGER.info("* Metrics saved to `{}`".format(Path(save_dir, "metrics")))
 

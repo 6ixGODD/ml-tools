@@ -16,7 +16,7 @@ from sklearn.feature_selection import (
     SelectFwe,
     f_classif,
 )
-from sklearn.linear_model import (Lasso, LassoCV, LogisticRegression)
+from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.model_selection import (
     KFold,
     StratifiedKFold,
@@ -111,4 +111,5 @@ def get_model_selection(name):
         raise ValueError("Model selection method not found.")
 
 
+# Dataclass for metrics
 Metrics = dataclasses.make_dataclass("Metric", ["name", "clf", "metrics"])
