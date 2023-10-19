@@ -52,8 +52,6 @@ def check_cfg(cfg):
         raise ValueError("Model selection should be a dict.")
     if not isinstance(cfg.preprocessing, dict):
         raise ValueError("Preprocessing should be a dict.")
-    if not isinstance(cfg.preprocessing["method"], str):
-        raise ValueError("Preprocessing method should be a string.")
     if not isinstance(cfg.model_selection["method"], str):
         raise ValueError("Model selection method should be a string.")
     if not isinstance(cfg.classifiers["methods"], list):
