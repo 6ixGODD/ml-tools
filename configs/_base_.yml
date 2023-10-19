@@ -2,7 +2,7 @@ shuffle: True
 random_state: 42
 
 preprocessing:
-  method: StandardScaler
+  method: null
   StandardScaler:
     with_mean: True
     with_std: True
@@ -138,6 +138,12 @@ classifiers:
 
 feature_selection:
   method: null
+  GenericUnivariateSelect:
+    score_func: f_classif
+    mode: percentile
+    param: 10
+  VarianceThreshold:
+    threshold: 0.0
   SelectKBest:
     score_func: f_classif
     k: 10

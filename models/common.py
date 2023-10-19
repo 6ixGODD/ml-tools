@@ -9,12 +9,21 @@ from sklearn.ensemble import (
     ExtraTreesClassifier,
 )
 from sklearn.feature_selection import (
+    GenericUnivariateSelect,
+    SequentialFeatureSelector,
+    RFE,
+    RFECV,
+    VarianceThreshold,
+    SelectFromModel,
     SelectKBest,
     SelectPercentile,
     SelectFpr,
     SelectFdr,
     SelectFwe,
     f_classif,
+    chi2,
+    mutual_info_classif,
+    f_oneway,
 )
 from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.model_selection import (
@@ -37,78 +46,87 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def get_preprocessing(name):
-    if name == "StandardScaler":
-        return StandardScaler
-    elif name == "MinMaxScaler":
-        return MinMaxScaler
-    elif name == "MaxAbsScaler":
-        return MaxAbsScaler
-    elif name == "RobustScaler":
-        return RobustScaler
-    elif name == "Normalizer":
-        return Normalizer
-    else:
-        raise ValueError("Preprocessing method not found.")
+    preprocessing_methods = {
+        "StandardScaler": StandardScaler,
+        "MinMaxScaler": MinMaxScaler,
+        "MaxAbsScaler": MaxAbsScaler,
+        "RobustScaler": RobustScaler,
+        "Normalizer": Normalizer,
+    }
+
+    if name not in preprocessing_methods:
+        raise ValueError(f"Preprocessing method '{name}' not found.")
+
+    return preprocessing_methods[name]
 
 
-def get_classifiers(name):
-    if name == "SVC":
-        return svm.SVC
-    elif name == "AdaBoost":
-        return AdaBoostClassifier
-    elif name == "Bagging":
-        return BaggingClassifier
-    elif name == "RandomForest":
-        return RandomForestClassifier
-    elif name == "LogisticRegression":
-        return LogisticRegression
-    elif name == "GaussianNB":
-        return GaussianNB
-    elif name == "KNN":
-        return KNeighborsClassifier
-    elif name == "DecisionTree":
-        return DecisionTreeClassifier
-    elif name == "ExtraTrees":
-        return ExtraTreesClassifier
-    else:
-        print(name)
-        raise ValueError("Algorithm not found.")
+def get_classifier(name):
+    classifiers = {
+        "SVC": svm.SVC,
+        "AdaBoost": AdaBoostClassifier,
+        "Bagging": BaggingClassifier,
+        "RandomForest": RandomForestClassifier,
+        "LogisticRegression": LogisticRegression,
+        "GaussianNB": GaussianNB,
+        "KNN": KNeighborsClassifier,
+        "DecisionTree": DecisionTreeClassifier,
+        "ExtraTrees": ExtraTreesClassifier,
+    }
+
+    if name not in classifiers:
+        raise ValueError(f"Classifier '{name}' not found.")
+
+    return classifiers[name]
 
 
-def get_feature_selection(name):
-    if name == "SelectKBest":
-        return SelectKBest
-    elif name == "SelectPercentile":
-        return SelectPercentile
-    elif name == "SelectFpr":
-        return SelectFpr
-    elif name == "SelectFdr":
-        return SelectFdr
-    elif name == "SelectFwe":
-        return SelectFwe
-    elif name == "Lasso":
-        return Lasso
-    elif name == "LassoCV":
-        return LassoCV
-    elif name == "f_classif":
-        return f_classif
-    else:
-        raise ValueError("Feature selection method not found.")
+def get_feature_selector(name):
+    feature_selectors = {
+        "SelectKBest": SelectKBest,
+        "SelectPercentile": SelectPercentile,
+        "SelectFpr": SelectFpr,
+        "SelectFdr": SelectFdr,
+        "SelectFwe": SelectFwe,
+        "GenericUnivariateSelect": GenericUnivariateSelect,
+        "SequentialFeatureSelector": SequentialFeatureSelector,
+        "RFE": RFE,
+        "RFECV": RFECV,
+        "VarianceThreshold": VarianceThreshold,
+        "SelectFromModel": SelectFromModel,
+    }
+
+    if name not in feature_selectors:
+        raise ValueError("feature selectors {} not found.".format(name))
+
+    return feature_selectors[name]
+
+
+def get_feature_selection_score(name):
+    score_func = {
+        "f_classif": f_classif,
+        "chi2": chi2,
+        "mutual_info_classif": mutual_info_classif,
+        "f_oneway": f_oneway,
+    }
+
+    if name not in score_func:
+        raise ValueError(f"Feature selection score '{name}' not found.")
+
+    return score_func[name]
 
 
 def get_model_selection(name):
-    if name == "KFold":
-        return KFold
-    elif name == "StratifiedKFold":
-        return StratifiedKFold
-    elif name == "RepeatedKFold":
-        return RepeatedKFold
-    elif name == "RepeatedStratifiedKFold":
-        return RepeatedStratifiedKFold
-    elif name == "train_test_split":
-        return train_test_split
-    else:
-        raise ValueError("Model selection method not found.")
+    model_selection_methods = {
+        "KFold": KFold,
+        "StratifiedKFold": StratifiedKFold,
+        "RepeatedKFold": RepeatedKFold,
+        "RepeatedStratifiedKFold": RepeatedStratifiedKFold,
+        "train_test_split": train_test_split,
+    }
+
+    if name not in model_selection_methods:
+        raise ValueError(f"Model selection method '{name}' not found.")
+
+    return model_selection_methods[name]
 
 
 # Dataclass for metrics
