@@ -92,6 +92,8 @@ def get_feature_selector(name):
         "RFECV": RFECV,
         "VarianceThreshold": VarianceThreshold,
         "SelectFromModel": SelectFromModel,
+        "Lasso": Lasso,
+        "LassoCV": LassoCV,
     }
 
     if name not in feature_selectors:

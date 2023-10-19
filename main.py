@@ -67,6 +67,7 @@ def run(data, cfg, save_dir, plot, save):
         )
     )
     y, X = data["label"], data.drop("label", axis=1)
+
     # data preprocessing
     if cfg.shuffle:
         X, y = shuffle(X, y, random_state=cfg.random_state)
@@ -86,6 +87,7 @@ def run(data, cfg, save_dir, plot, save):
                 "-" * 160, cfg.feature_selection["method"],
             )
         )
+
         # Lasso and LassoCV
         if (
             cfg.feature_selection["method"] == "Lasso"
@@ -97,16 +99,18 @@ def run(data, cfg, save_dir, plot, save):
             if plot and cfg.feature_selection["method"] == "LassoCV":
                 plot_lasso_mse(fs, save_dir=Path(save_dir, "plot"))
                 plot_lasso_path(fs, X, y, save_dir=Path(save_dir, "plot"))
-            X = X[:, fs.coef_ != 0]
+            X = np.array(X)[:, fs.coef_ != 0]
             LOGGER.info(
                 "\tSelected {:d} variables\n\t"
                 "Coefficients: {}\n\t"
-                "alpha: {}".format(
+                "alpha: {}\n{}".format(
                     np.sum(fs.coef_ != 0),
                     str(fs.coef_).replace("\n", "\n\t"),
                     fs.alpha_,
+                    "-" * 160,
                 )
             )
+
         # other methods
         elif cfg.feature_selection["method"] in [
             "SelectKBest",
@@ -339,6 +343,7 @@ def run(data, cfg, save_dir, plot, save):
         plot_pr(metrics, save_dir=Path(save_dir, "plot"))
         plot_roc(metrics, save_dir=Path(save_dir, "plot"))
         LOGGER.info("* Plots saved to `{}`".format(Path(save_dir, "plot")))
+
     LOGGER.info("{}\n> Done!\n{}".format("-" * 160, "-" * 160))  # end of run
     LOGGER.info(
         "> Metrics Summary:\n\n{}".format(
