@@ -30,11 +30,12 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
 from utils import Config, increment_path, get_logger
 from utils.check import check_data, check_cfg
-from utils.plots import plot_roc, plot_pr
+from utils.plots import plot_roc, plot_pr, plot_lasso_mse, plot_lasso_path
 from models.common import (
     get_preprocessing,
-    get_feature_selection,
-    get_classifiers,
+    get_feature_selector,
+    get_feature_selection_score,
+    get_classifier,
     get_model_selection,
     Metrics,
 )
@@ -44,23 +45,28 @@ LOGGER = None
 
 def run(data, cfg, save_dir, plot, save):
     LOGGER.info(
-        "=" * 160
-        + "\n>> ML-EnsembleHub :)\n"
-        + "=" * 160
-        + "\nML-EnsembleHub is a Python tool designed for ensemble machine learning experiments. "
+        "{}\n"
+        ">> ML-EnsembleHub :)\n"
+        "{}\n"
+        "ML-EnsembleHub is a Python tool designed for ensemble machine learning experiments. "
         "It provides an easy-to-use interface for building and evaluating ensemble \n"
         "models using various classifiers, feature selection techniques, and model selection methods.\n"
-        + "-" * 160
-        + "\n> Data Summary:\n\n{}\n".format(str(data.describe()).replace("\n", "\n\t"))
-        + "-" * 160
-        + "\n> Config Summary:\n\n{}\n".format(
-            str(yaml.dump(cfg)).replace("\n", "\n\t")
+        "{}\n"
+        "> Data Summary:\n\n{}\n"
+        "{}\n"
+        "> Config Summary:\n\n{}\n"
+        "{}\n"
+        "- start running...".format(
+            "=" * 160,
+            "-" * 160,
+            "-" * 160,
+            str(data.describe()).replace("\n", "\n\t"),
+            "-" * 160,
+            str(yaml.dump(cfg)).replace("\n", "\n\t"),
+            "-" * 160,
         )
-        + "-" * 160
-        + "\n- start running..."
     )
     y, X = data["label"], data.drop("label", axis=1)
-
     # data preprocessing
     if cfg.shuffle:
         X, y = shuffle(X, y, random_state=cfg.random_state)
@@ -75,20 +81,32 @@ def run(data, cfg, save_dir, plot, save):
     # feature selection
     if cfg.feature_selection["method"] is not None:
         LOGGER.info(
-            "-" * 160
-            + "\n> Feature selection: {}".format(cfg.feature_selection["method"])
+            "{}\n"
+            "> Feature Selection: {}\n".format(
+                "-" * 160, cfg.feature_selection["method"],
+            )
         )
         # Lasso and LassoCV
         if (
             cfg.feature_selection["method"] == "Lasso"
             or cfg.feature_selection["method"] == "LassoCV"
         ):
-            fs = get_feature_selection(cfg.feature_selection["method"])
+            fs = get_feature_selector(cfg.feature_selection["method"])
             fs = fs(**cfg.feature_selection[cfg.feature_selection["method"]])
             fs.fit(X, y)
+            if plot and cfg.feature_selection["method"] == "LassoCV":
+                plot_lasso_mse(fs, save_dir=Path(save_dir, "plot"))
+                plot_lasso_path(fs, X, y, save_dir=Path(save_dir, "plot"))
             X = X[:, fs.coef_ != 0]
-            LOGGER.info("\tSelected {:d} variables".format(len(X[0])))
-            LOGGER.info("\talpha: {}".format(fs.alpha_))
+            LOGGER.info(
+                "\tSelected {:d} variables\n\t"
+                "Coefficients: {}\n\t"
+                "alpha: {}".format(
+                    np.sum(fs.coef_ != 0),
+                    str(fs.coef_).replace("\n", "\n\t"),
+                    fs.alpha_,
+                )
+            )
         # other methods
         elif cfg.feature_selection["method"] in [
             "SelectKBest",
@@ -96,40 +114,43 @@ def run(data, cfg, save_dir, plot, save):
             "SelectFpr",
             "SelectFdr",
             "SelectFwe",
+            "GenericUnivariateSelect",
         ]:
-            # k should be <= n_features. avoid `ValueError` in `fit`
-            if cfg.feature_selection["method"] is "SelectKBest":
-                if (
-                    cfg.feature_selection[cfg.feature_selection["method"]]["k"]
-                    > X.shape[1]
-                ):
-                    warnings.warn(
-                        "k should be less than or equal to the number of features. skipping..."
-                    )
-            else:
-                fs = get_feature_selection(cfg.feature_selection["method"])
-                score_func = get_feature_selection(
-                    cfg.feature_selection[cfg.feature_selection["method"]].pop(
-                        "score_func"
-                    )
-                )
-                fs = fs(
-                    **cfg.feature_selection[cfg.feature_selection["method"]],
-                    score_func=score_func,
-                )
-                fs.fit(X, y)
-                X = fs.transform(X)
+            # k should be <= n_features. avoid `ValueError` in `SelectKBest`.
+            if (
+                cfg.feature_selection["method"] == "SelectKBest"
+                and cfg.feature_selection[cfg.feature_selection["method"]]["k"]
+                > X.shape[1]
+            ):
                 LOGGER.info(
-                    "- Selected features: {}"
-                    "\n\t Feature scores: {}"
-                    "\n\t Feature pvalues: {}".format(
-                        str(fs.get_support(indices=True)).replace("\n", "\n\t"),
-                        str(fs.scores_).replace("\n", "\n\t"),
-                        str(fs.pvalues_).replace("\n", "\n\t"),
-                    )
-                    + "\n"
-                    + "-" * 160
+                    "`k` should be <= n_features. " "Set `k` to {}.".format(X.shape[1])
                 )
+                cfg.feature_selection[cfg.feature_selection["method"]]["k"] = X.shape[1]
+            fs = get_feature_selector(cfg.feature_selection["method"])
+            LOGGER.info(
+                "- Score function: {}".format(
+                    cfg.feature_selection[cfg.feature_selection["method"]]["score_func"]
+                )
+            )
+            score_func = get_feature_selection_score(
+                cfg.feature_selection[cfg.feature_selection["method"]].pop("score_func")
+            )
+            fs = fs(
+                **cfg.feature_selection[cfg.feature_selection["method"]],
+                score_func=score_func,
+            )
+            fs.fit(X, y)
+            X = fs.transform(X)
+            LOGGER.info(
+                "- Selected features: {}\n\t"
+                " Feature scores: {}\n\t"
+                " Feature pvalues: {}\n{}".format(
+                    str(fs.get_support(indices=True)).replace("\n", "\n\t"),
+                    str(fs.scores_).replace("\n", "\n\t"),
+                    str(fs.pvalues_).replace("\n", "\n\t"),
+                    "-" * 160,
+                )
+            )
 
         else:
             raise NotImplementedError
@@ -138,17 +159,17 @@ def run(data, cfg, save_dir, plot, save):
     LOGGER.info("- start training...")
     metrics = []
     for clf_name in cfg.classifiers["methods"]:
-        clf = get_classifiers(clf_name)
+        clf = get_classifier(clf_name)
         clf = clf(**cfg.classifiers[clf_name])
         LOGGER.info(
-            "-" * 160
-            + "\n> Classifier: {}".format(clf_name)
-            + "\n- Hyperparameters: \n\t{}\n".format(
-                str(yaml.dump(clf.get_params())).replace("\n", "\n\t")
+            "{}\n"
+            "> Classifier: {}\n"
+            "- Hyperparameters: \n\t{}".format(
+                "-" * 160,
+                clf_name,
+                str(yaml.dump(clf.get_params())).replace("\n", "\n\t"),
             )
-            + "-" * 160
         )
-
         # model selection
         ms = get_model_selection(cfg.model_selection["method"])
         # train_test_split
@@ -318,7 +339,7 @@ def run(data, cfg, save_dir, plot, save):
         plot_pr(metrics, save_dir=Path(save_dir, "plot"))
         plot_roc(metrics, save_dir=Path(save_dir, "plot"))
         LOGGER.info("* Plots saved to `{}`".format(Path(save_dir, "plot")))
-    LOGGER.info("-" * 160 + "\n> Done!" + "\n" + "-" * 160)  # end of run
+    LOGGER.info("{}\n> Done!\n{}".format("-" * 160, "-" * 160))  # end of run
     LOGGER.info(
         "> Metrics Summary:\n\n{}".format(
             metrics_df.to_string(
