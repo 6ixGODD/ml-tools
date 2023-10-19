@@ -41,7 +41,7 @@ shuffle: <bool>
 random_state: <int>
 
 preprocessing:
-    method: <method_name>
+    method: <method_name>/null
     <method_name>:
         <param_name>: <param_value>
 
@@ -63,9 +63,9 @@ model_selection:
 
 - `shuffle` - 启用数据混洗
 - `random_state` - 定义随机种子
-- `preprocessing` - 选择预处理方法
+- `preprocessing` - 选择预处理方法 / 禁用预处理(null)
 - `classifiers` - 配置分类器列表
-- `feature_selection` - 选择特征选择方法
+- `feature_selection` - 选择特征选择方法 / 禁用特征选择(null)
 - `model_selection` - 选择模型选择方法
 
 ## 数据集 
