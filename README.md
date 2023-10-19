@@ -41,7 +41,7 @@ shuffle: <bool>
 random_state: <int>
 
 preprocessing:
-    method: <method_name>
+    method: <method_name>/null
     <method_name>:
         <param_name>: <param_value>
 
@@ -63,9 +63,9 @@ model_selection:
 
 - `shuffle` - Enable data shuffling
 - `random_state` - Define the random seed
-- `preprocessing` - Choose a preprocessing method
+- `preprocessing` - Choose a preprocessing method / disable preprocessing(null)
 - `classifiers` - Configure the list of classifiers
-- `feature_selection` - Select a feature selection method
+- `feature_selection` - Select a feature selection method / disable feature selection(null)
 - `model_selection` - Pick a model selection method
 
 ## Dataset 
