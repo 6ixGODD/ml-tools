@@ -7,6 +7,10 @@ from sklearn.ensemble import (
     AdaBoostClassifier,
     BaggingClassifier,
     ExtraTreesClassifier,
+    GradientBoostingClassifier,
+    VotingClassifier,
+    StackingClassifier,
+    HistGradientBoostingClassifier,
 )
 from sklearn.feature_selection import (
     GenericUnivariateSelect,
@@ -71,6 +75,9 @@ def get_classifier(name):
         "KNN": KNeighborsClassifier,
         "DecisionTree": DecisionTreeClassifier,
         "ExtraTrees": ExtraTreesClassifier,
+        "GradientBoosting": GradientBoostingClassifier,
+        "Voting": VotingClassifier,
+        "Stacking": StackingClassifier,
     }
 
     if name not in classifiers:

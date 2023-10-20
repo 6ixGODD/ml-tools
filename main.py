@@ -45,17 +45,12 @@ LOGGER = None
 
 def run(data, cfg, save_dir, plot, save):
     LOGGER.info(
-        "{}\n"
-        ">> ML-EnsembleHub :)\n"
-        "{}\n"
+        "{}\n>> ML-EnsembleHub :)\n{}\n"
         "ML-EnsembleHub is a Python tool designed for ensemble machine learning experiments. "
         "It provides an easy-to-use interface for building and evaluating ensemble \n"
-        "models using various classifiers, feature selection techniques, and model selection methods.\n"
-        "{}\n"
-        "> Data Summary:\n\n{}\n"
-        "{}\n"
-        "> Config Summary:\n\n{}\n"
-        "{}\n"
+        "models using various classifiers, feature selection techniques, and model selection methods.\n{}\n"
+        "> Data Summary:\n\n{}\n{}\n"
+        "> Config Summary:\n\n{}\n{}\n"
         "- start running...".format(
             "=" * 160,
             "-" * 160,
@@ -136,13 +131,12 @@ def run(data, cfg, save_dir, plot, save):
                     cfg.feature_selection[cfg.feature_selection["method"]]["score_func"]
                 )
             )
-            score_func = get_feature_selection_score(
-                cfg.feature_selection[cfg.feature_selection["method"]].pop("score_func")
+            cfg.feature_selection[cfg.feature_selection["method"]][
+                "score_func"
+            ] = get_feature_selection_score(
+                cfg.feature_selection[cfg.feature_selection["method"]]["score_func"]
             )
-            fs = fs(
-                **cfg.feature_selection[cfg.feature_selection["method"]],
-                score_func=score_func,
-            )
+            fs = fs(**cfg.feature_selection[cfg.feature_selection["method"]])
             fs.fit(X, y)
             X = fs.transform(X)
             LOGGER.info(
@@ -164,6 +158,14 @@ def run(data, cfg, save_dir, plot, save):
     metrics = []
     for clf_name in cfg.classifiers["methods"]:
         clf = get_classifier(clf_name)
+        # set base_estimator for AdaBoost and Bagging
+        if (
+            clf_name in ["AdaBoost", "Bagging"]
+            and cfg.classifiers[clf_name]["base_estimator"] is not None
+        ):
+            cfg.classifiers[clf_name]["base_estimator"] = get_classifier(
+                cfg.classifiers[clf_name]["base_estimator"]
+            )(**cfg.classifiers[cfg.classifiers[clf_name]["base_estimator"]])
         clf = clf(**cfg.classifiers[clf_name])
         LOGGER.info(
             "{}\n"
@@ -265,9 +267,9 @@ def run(data, cfg, save_dir, plot, save):
                 LOGGER.info(
                     "\tNo.{:d} fold:"
                     "\tAccuracy: {:.5f}  "
-                    "Precision: {:.5f} "
-                    " Recall: {:.5f} "
-                    " F1: {:.5f}  "
+                    "Precision: {:.5f}  "
+                    "Recall: {:.5f}  "
+                    "F1: {:.5f}  "
                     "AUC: {:.5f}".format(
                         i,
                         accuracy_score(y_test, y_pred),
