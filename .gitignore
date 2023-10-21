@@ -1,11 +1,13 @@
 # data files
 *.csv
-/data/
+/data/*.csv
+!/data/data.csv
 # output of the model
 /output/
 # config files
 !/configs/_base_.yml
 *.yml
+*.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
