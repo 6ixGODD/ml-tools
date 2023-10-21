@@ -1,7 +1,7 @@
 # data files
 *.csv
 /data/*.csv
-!/data/data.csv
+!/data/credit.csv
 # output of the model
 /output/
 # config files
