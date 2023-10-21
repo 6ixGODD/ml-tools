@@ -14,13 +14,6 @@ classifiers:
     - RandomForest
     - LogisticRegression
     - KNN
-    - AdaBoost
-    - GaussianNB
-    - Bagging
-    - ExtraTrees
-    - DecisionTree
-    - GradientBoosting
-    - HistGradientBoosting
   SVC:
     C: 1.0
     kernel: rbf
@@ -87,93 +80,7 @@ classifiers:
     learning_rate: 1.0
     algorithm: SAMME.R
     random_state: 42
-  GaussianNB:
-    priors: null
-    var_smoothing: 0.000000001
-  Bagging:
-    base_estimator: null
-    n_estimators: 10
-    max_samples: 1.0
-    max_features: 1.0
-    bootstrap: True
-    bootstrap_features: False
-    oob_score: False
-    warm_start: False
-    n_jobs: null
-    random_state: 42
-    verbose: 0
-  ExtraTrees:
-    n_estimators: 100
-    criterion: "gini"
-    max_depth: null
-    min_samples_split: 2
-    min_samples_leaf: 1
-    min_weight_fraction_leaf: 0.0
-    max_features: "auto"
-    max_leaf_nodes: null
-    min_impurity_decrease: 0.0
-    bootstrap: False
-    oob_score: False
-    n_jobs: null
-    random_state: 42
-    verbose: 0
-    warm_start: False
-    class_weight: null
-    ccp_alpha: 0.0
-    max_samples: null
-  DecisionTree:
-    criterion: gini
-    splitter: best
-    max_depth: null
-    min_samples_split: 2
-    min_samples_leaf: 1
-    min_weight_fraction_leaf: 0.0
-    max_features: null
-    random_state: 42
-    max_leaf_nodes: null
-    min_impurity_decrease: 0.0
-    class_weight: null
-    ccp_alpha: 0.0
-  GradientBoosting:
-    loss: deviance
-    learning_rate: 0.1
-    n_estimators: 100
-    subsample: 1.0
-    criterion: friedman_mse
-    min_samples_split: 2
-    min_samples_leaf: 1
-    min_weight_fraction_leaf: 0.0
-    max_depth: 3
-    min_impurity_decrease: 0.0
-    init: null
-    random_state: 42
-    max_features: null
-    verbose: 0
-    max_leaf_nodes: null
-    warm_start: False
-    validation_fraction: 0.1
-    n_iter_no_change: null
-    tol: 0.0001
-    ccp_alpha: 0.0
-  HistGradientBoosting:
-    loss: auto
-    learning_rate: 0.1
-    max_iter: 100
-    max_leaf_nodes: 31
-    max_depth: null
-    min_samples_leaf: 20
-    l2_regularization: 0.0
-    max_bins: 255
-    categorical_features: null
-    monotonic_cst: null
-    warm_start: False
-    early_stopping: auto
-    scoring: loss
-    validation_fraction: 0.1
-    n_iter_no_change: 10
-    tol: 0.0000001
-    verbose: 0
-    random_state: 42
+
 
 feature_selection:
   method: LassoCV
