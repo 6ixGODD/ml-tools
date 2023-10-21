@@ -69,7 +69,7 @@ model_selection:
 - `model_selection` - 选择模型选择方法
 
 ## 数据集 
-确保数据以 CSV 格式存储，第一列指定为 `label`，后续列代表特征：
+确保数据以 CSV 格式存储，其中一列指定为 `label`，其他列代表特征：
 
 | label | feature1 | feature2 | ... |
 |-------|----------|----------|-----|
@@ -80,12 +80,7 @@ model_selection:
 使用以下命令运行示例实验：
 
 ```bash
-python main.py  --data data/iris.csv 
-                --cfg config/iris.yaml 
-                --save-dir exp
-                --name iris 
-                --save 
-                --plot
+python main.py  --data data/credit.csv --cfg configs/credit.yml --save-dir output --name credit --save --plot
 ```
 
 ## 结果 

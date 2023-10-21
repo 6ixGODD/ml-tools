@@ -69,7 +69,7 @@ model_selection:
 - `model_selection` - Pick a model selection method
 
 ## Dataset 
-Ensure data is in CSV format, with the first column designated as `label` and subsequent columns representing features:
+Ensure data is in CSV format, where one column is specified as `label` and the other columns represent features:
 
 | label | feature1 | feature2 | ... |
 |-------|----------|----------|-----|
@@ -80,12 +80,7 @@ Ensure data is in CSV format, with the first column designated as `label` and su
 Run an example experiment with the following command:
 
 ```bash
-python main.py  --data data/iris.csv 
-                --cfg config/iris.yaml 
-                --save-dir exp
-                --name iris 
-                --save 
-                --plot
+python main.py  --data data/credit.csv --cfg configs/credit.yml --save-dir output --name credit --save --plot
 ```
 
 ## Results 
