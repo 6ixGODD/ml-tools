@@ -1,12 +1,12 @@
 # ML-EnsembleHub 🚀
 
-ML-EnsembleHub is an innovative and user-friendly platform designed to streamline the process of constructing and assessing machine learning models. Through a drag-and-drop approach, it enables users to effortlessly harness various classifiers, feature selection techniques, and model selection methods. 
+基于scikit-learn，拖拽式配置机器学习实验，水论文工具 :)
 
-## Prerequisites
+## 先决条件 
 - Python 3.x
 
-## Installation 
-Get started with ML-EnsembleHub by cloning the repository and installing the required dependencies:
+## 安装 🛠
+克隆存储库并安装依赖项,
 
 ```bash
 git clone https://github.com/6ixGODD/ML-EnsembleHub.git
@@ -14,8 +14,8 @@ cd ML-EnsembleHub
 pip install -r requirements.txt
 ```
 
-## Usage
-Execute the main script using the following command-line options:
+## 使用 
+使用命令行选项执行脚本,
 
 ```bash
 python main.py  --data <path_to_data> 
@@ -26,15 +26,15 @@ python main.py  --data <path_to_data>
                 --plot
 ```
 
-- `--data` - Specify the path to your data
-- `--cfg` - Indicate the path to your configuration
-- `--save-dir` - Set the directory for saving results
-- `--name` - Define a name for the experiment
-- `--save` - Enable result saving
-- `--plot` - Generate result plots
+- `--data` - 指定数据路径
+- `--cfg` - 指定配置路径
+- `--save-dir` - 设置保存结果的目录
+- `--name` - 定义实验名称
+- `--save` - 启用结果保存 (metrics, models)
+- `--plot` - 启用plot
 
-## Configuration
-Utilize the YAML configuration to fine-tune experiments:
+## 配置 
+YAML 配置实验：
 
 ```yaml
 shuffle: <bool>
@@ -46,9 +46,15 @@ preprocessing:
         <param_name>: <param_value>
 
 classifiers:
-    method: [<method_name>, <method_name>, ...]
-    <method_name>:
+    method: 
+      - <method1_name>
+      - <method2_name>
+      - ...
+    <method1_name>:
         <param_name>: <param_value>
+    <method2_name>:
+        <param_name>: <param_value>
+    ...
 
 feature_selection:
     method: <method_name>/null
@@ -61,32 +67,32 @@ model_selection:
         <param_name>: <param_value>
 ```
 
-- `shuffle` - Enable data shuffling
-- `random_state` - Define the random seed
-- `preprocessing` - Choose a preprocessing method / disable preprocessing(null)
-- `classifiers` - Configure the list of classifiers
-- `feature_selection` - Select a feature selection method / disable feature selection(null)
-- `model_selection` - Pick a model selection method
+- `shuffle` - 启用数据混洗
+- `random_state` - 随机种子
+- `preprocessing` - 预处理方法 / 禁用(null)
+- `classifiers` - 分类器列表
+- `feature_selection` - 特征选择方法 / 禁用(null)
+- `model_selection` - model selection方法
 
-## Dataset 
-Ensure data is in CSV format, where one column is specified as `label` and the other columns represent features:
+## 数据集 
+确保数据以 CSV 格式存储，其中一列指定为 `label`，其他列代表特征：
 
 | label | feature1 | feature2 | ... |
 |-------|----------|----------|-----|
 | 0/1   | value1   | value2   | ... |
 | ...   | ...      | ...      | ... |
 
-## Example 
-Run an example experiment with the following command:
+## 示例 
+使用命令运行示例,
 
 ```bash
 python main.py  --data data/credit.csv --cfg configs/credit.yml --save-dir output --name credit --save --plot
 ```
 
-## Results 
-- Metrics: `output/<name_of_experiment>/metrics/metrics.csv`
-- Plots: `output/<name_of_experiment>/plots/`    
-- Models: `output/<name_of_experiment>/models/`
-- Logs: `output/<name_of_experiment>/log.txt`
+## 结果 
+- 指标：`output/<name_of_experiment>/metrics/metrics.csv`
+- 图表：`output/<name_of_experiment>/plots/`    
+- 模型：`output/<name_of_experiment>/models/`
+- 日志：`output/<name_of_experiment>/log.txt`
 
 :)
