@@ -1,11 +1,11 @@
 # data files
 *.csv
-/data/*.csv
 !/data/credit.csv
 # output of the model
 /output/
 # config files
 !/configs/_base_.yml
+!/configs/credit.yml
 *.yml
 *.yaml
 
