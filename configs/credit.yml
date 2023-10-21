@@ -1,0 +1,228 @@
+shuffle: True
+random_state: 42
+
+preprocessing:
+  method: StandardScaler
+  StandardScaler:
+    with_mean: True
+    with_std: True
+
+
+classifiers:
+  methods:
+    - SVC
+    - RandomForest
+    - LogisticRegression
+    - KNN
+    - AdaBoost
+    - GaussianNB
+    - Bagging
+    - ExtraTrees
+    - DecisionTree
+    - GradientBoostingClassifier
+    - HistGradientBoostingClassifier
+  SVC:
+    C: 1.0
+    kernel: rbf
+    degree: 3
+    gamma: scale
+    coef0: 0.0
+    shrinking: True
+    probability: True
+    tol: 0.001
+    cache_size: 200
+    class_weight: null
+    verbose: False
+    max_iter: -1
+    decision_function_shape: ovr
+    break_ties: False
+    random_state: 42
+  RandomForest:
+    n_estimators: 100
+    criterion: gini
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_features: "auto"
+    max_leaf_nodes: null
+    min_impurity_decrease: 0.0
+    bootstrap: True
+    oob_score: False
+    n_jobs: null
+    random_state: 42
+    verbose: 0
+    warm_start: False
+    class_weight: null
+    ccp_alpha: 0.0
+    max_samples: null
+  LogisticRegression:
+    penalty: l2
+    dual: False
+    tol: 0.0001
+    C: 1.0
+    fit_intercept: True
+    intercept_scaling: 1
+    class_weight: null
+    random_state: 42
+    solver: lbfgs
+    max_iter: 100
+    multi_class: auto
+    verbose: 0
+    warm_start: False
+    n_jobs: null
+    l1_ratio: null
+  KNN:
+    n_neighbors: 5
+    weights: uniform
+    algorithm: auto
+    leaf_size: 30
+    p: 2
+    metric: minkowski
+    metric_params: null
+    n_jobs: null
+  AdaBoost:
+    base_estimator: null
+    n_estimators: 50
+    learning_rate: 1.0
+    algorithm: SAMME.R
+    random_state: 42
+  GaussianNB:
+    priors: null
+    var_smoothing: 0.000000001
+  Bagging:
+    base_estimator: null
+    n_estimators: 10
+    max_samples: 1.0
+    max_features: 1.0
+    bootstrap: True
+    bootstrap_features: False
+    oob_score: False
+    warm_start: False
+    n_jobs: null
+    random_state: 42
+    verbose: 0
+  ExtraTrees:
+    n_estimators: 100
+    criterion: "gini"
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_features: "auto"
+    max_leaf_nodes: null
+    min_impurity_decrease: 0.0
+    bootstrap: False
+    oob_score: False
+    n_jobs: null
+    random_state: 42
+    verbose: 0
+    warm_start: False
+    class_weight: null
+    ccp_alpha: 0.0
+    max_samples: null
+  DecisionTree:
+    criterion: gini
+    splitter: best
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_features: null
+    random_state: 42
+    max_leaf_nodes: null
+    min_impurity_decrease: 0.0
+    class_weight: null
+    ccp_alpha: 0.0
+  GradientBoostingClassifier:
+    loss: deviance
+    learning_rate: 0.1
+    n_estimators: 100
+    subsample: 1.0
+    criterion: friedman_mse
+    min_samples_split: 2
+    min_samples_leaf: 1
+    min_weight_fraction_leaf: 0.0
+    max_depth: 3
+    min_impurity_decrease: 0.0
+    init: null
+    random_state: 42
+    max_features: null
+    verbose: 0
+    max_leaf_nodes: null
+    warm_start: False
+    presort: deprecated
+    validation_fraction: 0.1
+    n_iter_no_change: null
+    tol: 0.0001
+    ccp_alpha: 0.0
+  HistGradientBoostingClassifier:
+    loss: auto
+    learning_rate: 0.1
+    max_iter: 100
+    max_leaf_nodes: 31
+    max_depth: null
+    min_samples_leaf: 20
+    l2_regularization: 0.0
+    max_bins: 255
+    categorical_features: null
+    monotonic_cst: null
+    warm_start: False
+    early_stopping: auto
+    scoring: loss
+    validation_fraction: 0.1
+    n_iter_no_change: 10
+    tol: 0.0000001
+    verbose: 0
+    random_state: 42
+
+feature_selection:
+  method: LassoCV
+  LassoCV:
+    eps: 0.001
+    n_alphas: null
+    alphas: [ 0.001, 0.0012067926406393288,
+              0.0014563484775012444, 0.0017575106248547913,
+              0.0021209508879201904, 0.002559547922699536,
+              0.0030888435964774815, 0.003727593720314938,
+              0.004498432668969444, 0.005428675439323859,
+              0.006551285568595509, 0.0079060432109077,
+              0.009540954763499945, 0.01151395399326447,
+              0.013894954943731374, 0.016768329368110076,
+              0.020235896477251564, 0.02442053094548651,
+              0.029470517025518096, 0.03556480306223128,
+              0.04291934260128776, 0.0517947467923121,
+              0.0625055192527397, 0.07543120063354615,
+              0.09102981779915217, 0.10985411419875583,
+              0.13257113655901082, 0.15998587196060574,
+              0.19306977288832497, 0.2329951810515372,
+              0.2811768697974228, 0.3393221771895326,
+              0.4094915062380423, 0.49417133613238334,
+              0.5963623316594643, 0.7196856730011514,
+              0.868511373751352, 1.0481131341546852,
+              1.2648552168552958, 1.5264179671752318,
+              1.8420699693267144, 2.2229964825261934,
+              2.6826957952797246, 3.2374575428176433,
+              3.906939937054613, 4.714866363457389,
+              5.689866029018293, 6.866488450042998,
+              8.286427728546842, 10.0 ]
+    fit_intercept: True
+    precompute: auto
+    max_iter: 100000
+    tol: 0.0001
+    copy_X: True
+    cv: 10
+    verbose: False
+    n_jobs: null
+    positive: False
+    random_state: 42
+    selection: cyclic
+
+
+model_selection:
+  method: RepeatedStratifiedKFold
+  RepeatedStratifiedKFold:
+    n_splits: 5
+    n_repeats: 100
+    random_state: 42
+
