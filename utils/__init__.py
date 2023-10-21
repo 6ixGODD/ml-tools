@@ -1,6 +1,6 @@
 import keyword
 import logging
-import dataclasses
+import os
 from pathlib import Path
 
 
@@ -51,3 +51,12 @@ def get_logger(name, save_dir, enable_ch=True):
         logger.addHandler(ch)
     logger.addHandler(fh)
     return logger
+
+
+def get_terminal_width():
+    try:
+        terminal_size = os.get_terminal_size()
+        width = terminal_size.columns
+        return width
+    except OSError:
+        return 140

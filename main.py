@@ -28,7 +28,7 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
-from utils import Config, increment_path, get_logger
+from utils import Config, increment_path, get_logger, get_terminal_width
 from utils.check import check_data, check_cfg
 from utils.plots import plot_roc, plot_pr, plot_lasso_mse, plot_lasso_path
 from models.common import (
@@ -47,18 +47,18 @@ def run(data, cfg, save_dir, plot, save):
     LOGGER.info(
         "{}\n>> ML-EnsembleHub :)\n{}\n"
         "ML-EnsembleHub is a Python tool designed for ensemble machine learning experiments. "
-        "It provides an easy-to-use interface for building and evaluating ensemble \n"
+        "It provides an easy-to-use interface for building and evaluating ensemble "
         "models using various classifiers, feature selection techniques, and model selection methods.\n{}\n"
         "> Data Summary:\n\n{}\n{}\n"
         "> Config Summary:\n\n{}\n{}\n"
         "- start running...".format(
-            "=" * 160,
-            "-" * 160,
-            "-" * 160,
+            "=" * get_terminal_width(),
+            "-" * get_terminal_width(),
+            "-" * get_terminal_width(),
             str(data.describe()).replace("\n", "\n\t"),
-            "-" * 160,
+            "-" * get_terminal_width(),
             str(yaml.dump(cfg)).replace("\n", "\n\t"),
-            "-" * 160,
+            "-" * get_terminal_width(),
         )
     )
     y, X = data["label"], data.drop("label", axis=1)
@@ -68,7 +68,14 @@ def run(data, cfg, save_dir, plot, save):
         X, y = shuffle(X, y, random_state=cfg.random_state)
     if cfg.preprocessing["method"] is not None:
         LOGGER.info(
-            "-" * 160 + "\n> Preprocessing: {}".format(cfg.preprocessing["method"])
+            "{}\n> Preprocessing: {}\n"
+            "- Hyperparameters: \n\t{}".format(
+                "-" * get_terminal_width(),
+                cfg.preprocessing["method"],
+                str(yaml.dump(cfg.preprocessing[cfg.preprocessing["method"]])).replace(
+                    "\n", "\n\t"
+                ),
+            )
         )
         pre = get_preprocessing(cfg.preprocessing["method"])
         pre = pre(**cfg.preprocessing[cfg.preprocessing["method"]])
@@ -79,7 +86,7 @@ def run(data, cfg, save_dir, plot, save):
         LOGGER.info(
             "{}\n"
             "> Feature Selection: {}\n".format(
-                "-" * 160, cfg.feature_selection["method"],
+                "-" * get_terminal_width(), cfg.feature_selection["method"],
             )
         )
 
@@ -102,7 +109,7 @@ def run(data, cfg, save_dir, plot, save):
                     np.sum(fs.coef_ != 0),
                     str(fs.coef_).replace("\n", "\n\t"),
                     fs.alpha_,
-                    "-" * 160,
+                    "-" * get_terminal_width(),
                 )
             )
 
@@ -146,7 +153,7 @@ def run(data, cfg, save_dir, plot, save):
                     str(fs.get_support(indices=True)).replace("\n", "\n\t"),
                     str(fs.scores_).replace("\n", "\n\t"),
                     str(fs.pvalues_).replace("\n", "\n\t"),
-                    "-" * 160,
+                    "-" * get_terminal_width(),
                 )
             )
 
@@ -154,7 +161,7 @@ def run(data, cfg, save_dir, plot, save):
             raise NotImplementedError
 
     # train
-    LOGGER.info("- start training...")
+    LOGGER.info("- training...")
     metrics = []
     for clf_name in cfg.classifiers["methods"]:
         clf = get_classifier(clf_name)
@@ -171,7 +178,7 @@ def run(data, cfg, save_dir, plot, save):
             "{}\n"
             "> Classifier: {}\n"
             "- Hyperparameters: \n\t{}".format(
-                "-" * 160,
+                "-" * get_terminal_width(),
                 clf_name,
                 str(yaml.dump(clf.get_params())).replace("\n", "\n\t"),
             )
@@ -265,18 +272,16 @@ def run(data, cfg, save_dir, plot, save):
                 pr_auc_list.append(roc_auc_score(y_test, y_pred))
                 cm_list.append(confusion_matrix(y_test, y_pred))
                 LOGGER.info(
-                    "\tNo.{:d} fold:"
+                    "\tNo.{:d}:"
                     "\tAccuracy: {:.5f}  "
                     "Precision: {:.5f}  "
                     "Recall: {:.5f}  "
-                    "F1: {:.5f}  "
-                    "AUC: {:.5f}".format(
+                    "F1: {:.5f}".format(
                         i,
                         accuracy_score(y_test, y_pred),
                         precision_score(y_test, y_pred),
                         recall_score(y_test, y_pred),
                         f1_score(y_test, y_pred),
-                        roc_auc_score(y_test, y_pred),
                     )
                 )
             tpr = np.mean(tpr_list, axis=0)
@@ -313,7 +318,7 @@ def run(data, cfg, save_dir, plot, save):
             with open(Path(save_dir, "models", f"{clf_name}.pkl"), "wb") as f:
                 pickle.dump(clf, f)  # add other serialization methods
             LOGGER.info(
-                "* Model saved to `{}`".format(
+                "\n* Model saved to `{}`".format(
                     Path(save_dir, "models", f"{clf_name}.pkl")
                 )
             )
@@ -346,7 +351,9 @@ def run(data, cfg, save_dir, plot, save):
         plot_roc(metrics, save_dir=Path(save_dir, "plot"))
         LOGGER.info("* Plots saved to `{}`".format(Path(save_dir, "plot")))
 
-    LOGGER.info("{}\n> Done!\n{}".format("-" * 160, "-" * 160))  # end of run
+    LOGGER.info(
+        "{}\n- done!\n{}".format("-" * get_terminal_width(), "-" * get_terminal_width())
+    )  # end of run
     LOGGER.info(
         "> Metrics Summary:\n\n{}".format(
             metrics_df.to_string(
