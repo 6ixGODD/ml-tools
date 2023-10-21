@@ -19,8 +19,8 @@ classifiers:
     - Bagging
     - ExtraTrees
     - DecisionTree
-    - GradientBoostingClassifier
-    - HistGradientBoostingClassifier
+    - GradientBoosting
+    - HistGradientBoosting
   SVC:
     C: 1.0
     kernel: rbf
@@ -134,7 +134,7 @@ classifiers:
     min_impurity_decrease: 0.0
     class_weight: null
     ccp_alpha: 0.0
-  GradientBoostingClassifier:
+  GradientBoosting:
     loss: deviance
     learning_rate: 0.1
     n_estimators: 100
@@ -151,12 +151,11 @@ classifiers:
     verbose: 0
     max_leaf_nodes: null
     warm_start: False
-    presort: deprecated
     validation_fraction: 0.1
     n_iter_no_change: null
     tol: 0.0001
     ccp_alpha: 0.0
-  HistGradientBoostingClassifier:
+  HistGradientBoosting:
     loss: auto
     learning_rate: 0.1
     max_iter: 100
@@ -223,6 +222,6 @@ model_selection:
   method: RepeatedStratifiedKFold
   RepeatedStratifiedKFold:
     n_splits: 5
-    n_repeats: 100
+    n_repeats: 10
     random_state: 42
 

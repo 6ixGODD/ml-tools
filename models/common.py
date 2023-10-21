@@ -76,6 +76,7 @@ def get_classifier(name):
         "DecisionTree": DecisionTreeClassifier,
         "ExtraTrees": ExtraTreesClassifier,
         "GradientBoosting": GradientBoostingClassifier,
+        "HistGradientBoosting": HistGradientBoostingClassifier,
         "Voting": VotingClassifier,
         "Stacking": StackingClassifier,
     }
