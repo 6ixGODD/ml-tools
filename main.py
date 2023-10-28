@@ -105,26 +105,22 @@ def run(data, cfg, save_dir, plot, save):
             assert X.shape[1] != 0, "No features selected!"
             if cfg.feature_selection["method"] == "LassoCV":
                 LOGGER.info(
-                    "- Selected features: {}\n\t"
+                    "- Selected {} features\n\t"
                     "Coefficients: {}\n\t"
                     "Alpha: {}\n\t"
-                    "MSE: {}\n\t"
-                    "Alpha: {}\n\t"
                     "\n{}".format(
-                        str(fs.coef_ != 0).replace("\n", "\n\t"),
+                        str(X.shape[1]).replace("\n", "\n\t"),
                         str(fs.coef_).replace("\n", "\n\t"),
                         str(fs.alpha_).replace("\n", "\n\t"),
-                        str(fs.mse_path_).replace("\n", "\n\t"),
-                        str(fs.alphas_).replace("\n", "\n\t"),
                         "-" * get_terminal_width(),
                     )
                 )
             else:
                 LOGGER.info(
-                    "- Selected features: {}\n\t"
+                    "- Selected {} features\n\t"
                     "Coefficients: {}\n\t"
                     "Alpha: {}\n{}".format(
-                        str(fs.coef_ != 0).replace("\n", "\n\t"),
+                        str(X.shape[1]).replace("\n", "\n\t"),
                         str(fs.coef_).replace("\n", "\n\t"),
                         str(fs.alpha_).replace("\n", "\n\t"),
                         "-" * get_terminal_width(),
@@ -329,19 +325,11 @@ def run(data, cfg, save_dir, plot, save):
             )
 
             LOGGER.info(
-                "\n- Metrics:\n"
-                "\tAccuracy:\t{}\n"
-                "\tPrecision:\t{}\n"
-                "\tRecall:\t\t{}\n"
-                "\tF1:\t\t\t{}\n"
-                "\tAUC:\t\t{}\n"
-                "\tConfusion matrix: \n\t{}\n".format(
-                    accuracy_score(y_test, y_pred),
-                    precision_score(y_test, y_pred),
-                    recall_score(y_test, y_pred),
-                    f1_score(y_test, y_pred),
-                    roc_auc_score(y_test, y_pred),
-                    str(confusion_matrix(y_test, y_pred)).replace("\n", "\n\t"),
+                "- Metrics:\n"
+                "PR AUC: {}\n"
+                "ROC AUC: {}\n"
+                "Confusion matrix: \n\t{}\n".format(
+                    pr_auc, roc_auc, str(cm).replace("\n", "\n\t"),
                 )
             )
         else:
