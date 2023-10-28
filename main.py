@@ -102,16 +102,34 @@ def run(data, cfg, save_dir, plot, save):
                 plot_lasso_mse(fs, save_dir=Path(save_dir, "plot"))
                 plot_lasso_path(fs, X, y, save_dir=Path(save_dir, "plot"))
             X = np.array(X)[:, fs.coef_ != 0]
-            LOGGER.info(
-                "\tSelected {:d} variables\n\t"
-                "Coefficients: {}\n\t"
-                "alpha: {}\n{}".format(
-                    np.sum(fs.coef_ != 0),
-                    str(fs.coef_).replace("\n", "\n\t"),
-                    fs.alpha_,
-                    "-" * get_terminal_width(),
+            assert X.shape[1] != 0, "No features selected!"
+            if cfg.feature_selection["method"] == "LassoCV":
+                LOGGER.info(
+                    "- Selected features: {}\n\t"
+                    "Coefficients: {}\n\t"
+                    "Alpha: {}\n\t"
+                    "MSE: {}\n\t"
+                    "Alpha: {}\n\t"
+                    "\n{}".format(
+                        str(fs.coef_ != 0).replace("\n", "\n\t"),
+                        str(fs.coef_).replace("\n", "\n\t"),
+                        str(fs.alpha_).replace("\n", "\n\t"),
+                        str(fs.mse_path_).replace("\n", "\n\t"),
+                        str(fs.alphas_).replace("\n", "\n\t"),
+                        "-" * get_terminal_width(),
+                    )
                 )
-            )
+            else:
+                LOGGER.info(
+                    "- Selected features: {}\n\t"
+                    "Coefficients: {}\n\t"
+                    "Alpha: {}\n{}".format(
+                        str(fs.coef_ != 0).replace("\n", "\n\t"),
+                        str(fs.coef_).replace("\n", "\n\t"),
+                        str(fs.alpha_).replace("\n", "\n\t"),
+                        "-" * get_terminal_width(),
+                    )
+                )
 
         # other methods
         elif cfg.feature_selection["method"] in [
@@ -123,15 +141,10 @@ def run(data, cfg, save_dir, plot, save):
             "GenericUnivariateSelect",
         ]:
             # k should be <= n_features. avoid `ValueError` in `SelectKBest`.
-            if (
-                cfg.feature_selection["method"] == "SelectKBest"
-                and cfg.feature_selection[cfg.feature_selection["method"]]["k"]
-                > X.shape[1]
-            ):
-                LOGGER.info(
-                    "`k` should be <= n_features. " "Set `k` to {}.".format(X.shape[1])
-                )
-                cfg.feature_selection[cfg.feature_selection["method"]]["k"] = X.shape[1]
+            assert (
+                cfg.feature_selection[cfg.feature_selection["method"]]["k"]
+                <= X.shape[1]
+            ), "`k` should be <= n_features."
             fs = get_feature_selector(cfg.feature_selection["method"])
             LOGGER.info(
                 "- Score function: {}".format(
@@ -239,15 +252,17 @@ def run(data, cfg, save_dir, plot, save):
             )
             ms = ms(**cfg.model_selection[cfg.model_selection["method"]])
             fpr_, recall_ = np.linspace(0, 1, 100), np.linspace(0, 1, 100)
-            for i, (train_index, test_index) in tqdm(
+            LOGGER.info(
+                ("{:>11}" * 5).format("Fold", "Accuracy", "Precision", "Recall", "F1",)
+            )
+            bar = tqdm(
                 enumerate(ms.split(X, y)),
-                desc=clf_name,
                 total=ms.get_n_splits(),
-                ncols=60,
                 unit="fold",
-                mininterval=0,
-                position=0,
-            ):
+                bar_format="{l_bar}{bar:10}{r_bar}",
+            )
+            clf_logger = get_logger(clf_name, save_dir, enable_ch=False)
+            for i, (train_index, test_index) in bar:
                 # use iloc to avoid SettingWithCopyWarning
                 X_train, X_test = (
                     pd.DataFrame(X).iloc[train_index],
@@ -271,12 +286,17 @@ def run(data, cfg, save_dir, plot, save):
                 roc_auc_list.append(roc_auc_score(y_test, y_pred))
                 pr_auc_list.append(roc_auc_score(y_test, y_pred))
                 cm_list.append(confusion_matrix(y_test, y_pred))
-                LOGGER.info(
-                    "\tNo.{:d}:"
-                    "\tAccuracy: {:.5f}  "
-                    "Precision: {:.5f}  "
-                    "Recall: {:.5f}  "
-                    "F1: {:.5f}".format(
+                bar.set_description(
+                    ("{:11d}" + "{:11.4f}" * 4).format(
+                        i,
+                        accuracy_score(y_test, y_pred),
+                        precision_score(y_test, y_pred),
+                        recall_score(y_test, y_pred),
+                        f1_score(y_test, y_pred),
+                    )
+                )
+                clf_logger.info(
+                    ("{:11d}" + "{:11.4f}" * 4).format(
                         i,
                         accuracy_score(y_test, y_pred),
                         precision_score(y_test, y_pred),
@@ -305,6 +325,23 @@ def run(data, cfg, save_dir, plot, save):
                         "pr_auc": pr_auc,
                         "cm": cm,
                     },
+                )
+            )
+
+            LOGGER.info(
+                "\n- Metrics:\n"
+                "\tAccuracy:\t{}\n"
+                "\tPrecision:\t{}\n"
+                "\tRecall:\t\t{}\n"
+                "\tF1:\t\t\t{}\n"
+                "\tAUC:\t\t{}\n"
+                "\tConfusion matrix: \n\t{}\n".format(
+                    accuracy_score(y_test, y_pred),
+                    precision_score(y_test, y_pred),
+                    recall_score(y_test, y_pred),
+                    f1_score(y_test, y_pred),
+                    roc_auc_score(y_test, y_pred),
+                    str(confusion_matrix(y_test, y_pred)).replace("\n", "\n\t"),
                 )
             )
         else:
