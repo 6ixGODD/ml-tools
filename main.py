@@ -108,14 +108,10 @@ def run(data, cfg, save_dir, plot, save):
                     "- Selected features: {}\n\t"
                     "Coefficients: {}\n\t"
                     "Alpha: {}\n\t"
-                    "MSE: {}\n\t"
-                    "Alpha: {}\n\t"
                     "\n{}".format(
                         str(fs.coef_ != 0).replace("\n", "\n\t"),
                         str(fs.coef_).replace("\n", "\n\t"),
                         str(fs.alpha_).replace("\n", "\n\t"),
-                        str(fs.mse_path_).replace("\n", "\n\t"),
-                        str(fs.alphas_).replace("\n", "\n\t"),
                         "-" * get_terminal_width(),
                     )
                 )
