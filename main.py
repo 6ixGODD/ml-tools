@@ -1,5 +1,28 @@
 # ML-EnsembleHub :)
 
+# MIT License
+#
+# Copyright (c) 2023 6GOD
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+import time
 import argparse
 import os
 import pickle
@@ -46,31 +69,39 @@ LOGGER = None
 def run(data, cfg, save_dir, plot, save):
     LOGGER.info(
         "{}\n>> ML-EnsembleHub :)\n{}\n"
-        "ML-EnsembleHub is a Python tool designed for ensemble machine learning experiments. "
-        "It provides an easy-to-use interface for building and evaluating ensemble "
-        "models using various classifiers, feature selection techniques, and model selection methods.\n{}\n"
-        "> Data Summary:\n\n{}\n{}\n"
-        "> Config Summary:\n\n{}\n{}\n"
-        "- start running...".format(
+        "  ML-EnsembleHub is a Python tool designed for ensemble machine learning experiments. \n"
+        "  It provides an easy-to-use interface for building and evaluating ensemble \n"
+        "  models using various classifiers, feature selection techniques, and model selection methods.\n{}\n"
+        "- {}\n"
+        "  Data Summary:\n\n{}\n{}\n"
+        "- {}\n"
+        "  Config Summary:\n\n{}\n{}\n"
+        "- {}\n  start running...".format(
             "=" * get_terminal_width(),
             "-" * get_terminal_width(),
             "-" * get_terminal_width(),
+            pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
             str(data.describe()).replace("\n", "\n\t"),
             "-" * get_terminal_width(),
+            pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
             str(yaml.dump(cfg)).replace("\n", "\n\t"),
             "-" * get_terminal_width(),
+            pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
         )
     )
     y, X = data["label"], data.drop("label", axis=1)
 
     # data preprocessing
+    start = time.time()
     if cfg.shuffle:
         X, y = shuffle(X, y, random_state=cfg.random_state)
     if cfg.preprocessing["method"] is not None:
         LOGGER.info(
-            "{}\n> Preprocessing: {}\n"
+            "{}\n"
+            "- {}\n  Preprocessing: {}\n"
             "- Hyperparameters: \n\t{}".format(
                 "-" * get_terminal_width(),
+                pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
                 cfg.preprocessing["method"],
                 str(yaml.dump(cfg.preprocessing[cfg.preprocessing["method"]])).replace(
                     "\n", "\n\t"
@@ -80,13 +111,21 @@ def run(data, cfg, save_dir, plot, save):
         pre = get_preprocessing(cfg.preprocessing["method"])
         pre = pre(**cfg.preprocessing[cfg.preprocessing["method"]])
         X = pre.fit_transform(X)
+        LOGGER.info(
+            "- Transformed shape: {}\n".format(str(X.shape).replace("\n", "\n\t"))
+        )
+    LOGGER.info("- Preprocessing time: {}ms".format(int((time.time() - start) * 1000)))
 
     # feature selection
+    start = time.time()
     if cfg.feature_selection["method"] is not None:
         LOGGER.info(
             "{}\n"
-            "> Feature Selection: {}\n".format(
-                "-" * get_terminal_width(), cfg.feature_selection["method"],
+            "- {}\n"
+            "  Feature Selection: {}\n".format(
+                "-" * get_terminal_width(),
+                pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+                cfg.feature_selection["method"],
             )
         )
 
@@ -107,23 +146,20 @@ def run(data, cfg, save_dir, plot, save):
                 LOGGER.info(
                     "- Selected {} features\n\t"
                     "Coefficients: {}\n\t"
-                    "Alpha: {}\n\t"
-                    "\n{}".format(
+                    "Alpha: {}\n\t".format(
                         str(X.shape[1]).replace("\n", "\n\t"),
                         str(fs.coef_).replace("\n", "\n\t"),
                         str(fs.alpha_).replace("\n", "\n\t"),
-                        "-" * get_terminal_width(),
                     )
                 )
             else:
                 LOGGER.info(
                     "- Selected {} features\n\t"
                     "Coefficients: {}\n\t"
-                    "Alpha: {}\n{}".format(
+                    "Alpha: {}\n".format(
                         str(X.shape[1]).replace("\n", "\n\t"),
                         str(fs.coef_).replace("\n", "\n\t"),
                         str(fs.alpha_).replace("\n", "\n\t"),
-                        "-" * get_terminal_width(),
                     )
                 )
 
@@ -158,21 +194,31 @@ def run(data, cfg, save_dir, plot, save):
             LOGGER.info(
                 "- Selected features: {}\n\t"
                 " Feature scores: {}\n\t"
-                " Feature pvalues: {}\n{}".format(
+                " Feature pvalues: {}\n".format(
                     str(fs.get_support(indices=True)).replace("\n", "\n\t"),
                     str(fs.scores_).replace("\n", "\n\t"),
                     str(fs.pvalues_).replace("\n", "\n\t"),
-                    "-" * get_terminal_width(),
                 )
             )
 
         else:
             raise NotImplementedError
+        LOGGER.info(
+            "- Feature selection time: {}ms".format(int((time.time() - start) * 1000))
+        )
 
     # train
-    LOGGER.info("- training...")
+    start = time.time()
+    LOGGER.info(
+        "{}\n- {}\n"
+        "  training...".format(
+            "-" * get_terminal_width(),
+            pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+        )
+    )
     metrics = []
     for clf_name in cfg.classifiers["methods"]:
+        start_clf = time.time()
         clf = get_classifier(clf_name)
         # set base_estimator for AdaBoost and Bagging
         if (
@@ -185,9 +231,11 @@ def run(data, cfg, save_dir, plot, save):
         clf = clf(**cfg.classifiers[clf_name])
         LOGGER.info(
             "{}\n"
-            "> Classifier: {}\n"
+            "- {}\n"
+            "  Classifier: {}\n"
             "- Hyperparameters: \n\t{}".format(
                 "-" * get_terminal_width(),
+                pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
                 clf_name,
                 str(yaml.dump(clf.get_params())).replace("\n", "\n\t"),
             )
@@ -249,7 +297,9 @@ def run(data, cfg, save_dir, plot, save):
             ms = ms(**cfg.model_selection[cfg.model_selection["method"]])
             fpr_, recall_ = np.linspace(0, 1, 100), np.linspace(0, 1, 100)
             LOGGER.info(
-                ("{:>11}" * 5).format("Fold", "Accuracy", "Precision", "Recall", "F1",)
+                ("{:>11}" * 6).format(
+                    "Time", "Fold", "Accuracy", "Precision", "Recall", "F1",
+                )
             )
             bar = tqdm(
                 enumerate(ms.split(X, y)),
@@ -283,7 +333,8 @@ def run(data, cfg, save_dir, plot, save):
                 pr_auc_list.append(roc_auc_score(y_test, y_pred))
                 cm_list.append(confusion_matrix(y_test, y_pred))
                 bar.set_description(
-                    ("{:11d}" + "{:11.4f}" * 4).format(
+                    ("{:>11}" + "{:11d}" + "{:11.4f}" * 4).format(
+                        pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
                         i,
                         accuracy_score(y_test, y_pred),
                         precision_score(y_test, y_pred),
@@ -292,7 +343,8 @@ def run(data, cfg, save_dir, plot, save):
                     )
                 )
                 clf_logger.info(
-                    ("{:11d}" + "{:11.4f}" * 4).format(
+                    ("{:>11}" + "{:11d}" + "{:11.4f}" * 4).format(
+                        pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
                         i,
                         accuracy_score(y_test, y_pred),
                         precision_score(y_test, y_pred),
@@ -325,15 +377,19 @@ def run(data, cfg, save_dir, plot, save):
             )
 
             LOGGER.info(
-                "- Metrics:\n"
-                "PR AUC: {}\n"
-                "ROC AUC: {}\n"
-                "Confusion matrix: \n\t{}\n".format(
+                "\n- Metrics:\n"
+                "\tPR AUC: {}\n"
+                "\tROC AUC: {}\n"
+                "\tConfusion matrix: \n\t{}\n".format(
                     pr_auc, roc_auc, str(cm).replace("\n", "\n\t"),
                 )
             )
         else:
             raise NotImplementedError
+
+        LOGGER.info(
+            "- Total training time: {}ms".format(int((time.time() - start) * 1000))
+        )
 
         # save model
         if save:
@@ -377,7 +433,11 @@ def run(data, cfg, save_dir, plot, save):
         LOGGER.info("* Plots saved to `{}`".format(Path(save_dir, "plot")))
 
     LOGGER.info(
-        "{}\n- done!\n{}".format("-" * get_terminal_width(), "-" * get_terminal_width())
+        "{}\n- {}    done!\n{}".format(
+            "-" * get_terminal_width(),
+            pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+            "-" * get_terminal_width(),
+        )
     )  # end of run
     LOGGER.info(
         "> Metrics Summary:\n\n{}".format(
