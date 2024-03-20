@@ -6,7 +6,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-plt.rcParams["font.family"] = "Arial"
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman"]
 
 
 def plot_roc(metrics, save_dir=Path("")):
@@ -19,7 +20,7 @@ def plot_roc(metrics, save_dir=Path("")):
             tpr,
             fpr,
             lw=2,
-            label="{} (area = {:.2f})".format(metric.name, metric.metrics["roc_auc"]),
+            label=f"{metric.name} (area = {metric.metrics['roc_auc']:.2f})",
             linestyle="-",
         )
     plt.plot([0, 1], [0, 1], color="gray", lw=1, linestyle="--")
@@ -45,7 +46,7 @@ def plot_pr(metrics, save_dir=Path("")):
             recall,
             precision,
             lw=2,
-            label="{} (area = {:.2f})".format(metric.name, metric.metrics["pr_auc"]),
+            label=f"{metric.name} (area = {metric.metrics['pr_auc']:.2f})",
             linestyle="-",
         )
     plt.plot([0, 1], [0, 1], color="gray", lw=1, linestyle="--")
