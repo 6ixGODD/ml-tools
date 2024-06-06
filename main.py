@@ -93,6 +93,7 @@ def run(data, cfg, save_dir, plot, save):
 
     # data preprocessing
     start = time.time()
+    # noinspection PyTestUnpassedFixture
     if cfg.shuffle:
         X, y = shuffle(X, y, random_state=cfg.random_state)
     if cfg.preprocessing["method"] is not None:
@@ -218,7 +219,7 @@ def run(data, cfg, save_dir, plot, save):
     )
     metrics = []
     for clf_name in cfg.classifiers["methods"]:
-        start_clf = time.time()
+        # start_clf = time.time()
         clf = get_classifier(clf_name)
         # set base_estimator for AdaBoost and Bagging
         if (
