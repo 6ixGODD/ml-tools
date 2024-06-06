@@ -1,5 +1,5 @@
 # ML-EnsembleHub 🚀
-[中文](README.md) | [English](README.en.md)
+中文 | [English](README.md)
 
 基于scikit-learn，拖拽式配置机器学习实验，水论文工具 :)
 
