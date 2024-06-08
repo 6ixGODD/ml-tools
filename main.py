@@ -1,4 +1,5 @@
-# ML-EnsembleHub :)
+# ML-Tools
+# Author: 6GODD
 
 # MIT License
 #
