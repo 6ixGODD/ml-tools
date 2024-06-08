@@ -1,13 +1,9 @@
-# ML-Tools 🚀
-[中文](README.CN.md) | English
-
-Based on scikit-learn, drag-and-drop configuration of machine learning experiments, paper writing tools :)
-
+# ML-Tools 
 
 ## Prerequisites
 - Python 3.x
 
-## Installation 🛠
+## Installation 
 Clone the repository and install the dependencies,
 
 ```bash
