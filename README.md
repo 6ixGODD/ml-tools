@@ -7,8 +7,8 @@
 Clone the repository and install the dependencies,
 
 ```bash
-git clone https://github.com/6ixGODD/ML-EnsembleHub.git
-cd ML-EnsembleHub
+git clone https://github.com/6ixGODD/ml-tools.git
+cd ml-tools
 pip install -r requirements.txt
 ```
 
