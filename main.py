@@ -1,6 +1,6 @@
 # ML-Tools
 # Author: 6GODD
-
+import logging
 # MIT License
 #
 # Copyright (c) 2023 6GOD
@@ -64,7 +64,7 @@ from models.common import (
     Metrics,
 )
 
-LOGGER = None
+LOGGER: logging.Logger
 
 
 def run(data, cfg, save_dir, plot, save):
